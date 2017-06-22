@@ -111,24 +111,13 @@ sudo ln -s /etc/apache2/sites-available/nagios.conf /etc/apache2/sites-enabled/
 sudo chown -Rf nagios:nagios /usr/local/nagios
 
 ##########################################
-# firewall rules
-##########################################
-sudo mkdir -p /etc/iptables
-sudo cp /vagrant/etc/iptables/rules /etc/iptables/rules
-
-sudo sed -i "s/^iptables-restore//g" /etc/network/if-up.d/iptables
-sudo sh -c "echo 'iptables-restore < /etc/iptables/rules' >> /etc/network/if-up.d/iptables"
-sudo iptables-restore < /etc/iptables/rules
-
-iptables -I INPUT -m tcp -p tcp --dport 5666 -j ACCEPT
-
-##########################################
 # restart services
 ##########################################
 service apache2 restart
 sudo service xinetd restart
 #/etc/init.d/nagios restart
 service nagios restart
+#tail -f /var/log/syslog
 
 #http://192.168.82.170/nagios
 # nagiosadmin / nagiospasswd
@@ -142,3 +131,15 @@ sudo cp /vagrant/etc/nagios/ubuntu_host.cfg /usr/local/nagios/etc/servers/ubuntu
 /usr/local/nagios/bin/nagios -v /usr/local/nagios/etc/nagios.cfg
 
 exit 0
+
+##########################################
+# firewall rules
+##########################################
+sudo mkdir -p /etc/iptables
+sudo cp /vagrant/etc/iptables/rules /etc/iptables/rules
+
+sudo sed -i "s/^iptables-restore//g" /etc/network/if-up.d/iptables
+sudo sh -c "echo 'iptables-restore < /etc/iptables/rules' >> /etc/network/if-up.d/iptables"
+sudo iptables-restore < /etc/iptables/rules
+
+iptables -I INPUT -m tcp -p tcp --dport 5666 -j ACCEPT
