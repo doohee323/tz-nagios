@@ -1,4 +1,4 @@
-This is a Nagios server example on vagrant.
+a Nagios server example on vagrant.
 ==========================================================================
 
 # Features
@@ -9,13 +9,13 @@ This is a Nagios server example on vagrant.
 	2. open firewall
 ```
 
-# Execution
+# Run
 ```
 	vagrant up
 	#vagrant destroy -f && vagrant up
 ```
 
-# Run
+# Site
 ```
  	http://192.168.82.170/nagios
 ```
