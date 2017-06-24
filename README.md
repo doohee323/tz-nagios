@@ -7,6 +7,8 @@ a Nagios server example on vagrant.
 	    'nserver' => "192.168.82.170",
 	    'nclient' => "192.168.82.171",
 	2. open firewall
+	3. nginx version: master branch
+	   apache version: apache branch
 ```
 
 # Run
