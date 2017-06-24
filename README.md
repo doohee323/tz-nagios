@@ -19,6 +19,9 @@ a Nagios server example on vagrant.
 
 # Site
 ```
+	# add vagrant server in /etc/hosts 
+	192.168.82.170 server.tz.com
+	
  	http://192.168.82.170/nagios
 ```
 
