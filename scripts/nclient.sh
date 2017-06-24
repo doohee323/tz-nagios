@@ -20,6 +20,7 @@ sudo sh -c "echo '' >> /etc/nagios/nrpe.cfg"
 sudo sh -c "echo 'command[check_hda1]=/usr/lib/nagios/plugins/check_disk -w 20% -c 10% -p /dev/sda1' >> /etc/nagios/nrpe.cfg"
 
 # for make ssh connection
+mkdir -p /root/.ssh
 sudo cp /vagrant/etc/known_hosts /root/.ssh/known_hosts
 
 ##########################################
