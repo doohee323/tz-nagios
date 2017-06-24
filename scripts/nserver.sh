@@ -12,8 +12,8 @@ source /vagrant/setup.rc
 export DEBIAN_FRONTEND=noninteractive
 
 apt-get -y update
-apt-get install wget build-essential apache2 php apache2-mod-php7.0 php-gd libgd-dev sendmail unzip -y
-apt-get install build-essential libgd2-xpm-dev openssl libssl-dev xinetd apache2-utils unzip -y
+apt-get install wget unzip build-essential libgd2-xpm-dev apache2-utils -y
+apt-get install xinetd php7.0-fpm spawn-fcgi fcgiwrap -y
 
 ##########################################
 # install nagios
@@ -23,20 +23,27 @@ groupadd nagcmd
 usermod -a -G nagcmd nagios
 usermod -a -G nagios,nagcmd www-data
 
+cd /home/vagrant
 curl -L -O https://assets.nagios.com/downloads/nagioscore/releases/nagios-4.1.1.tar.gz
 tar xvf nagios-*.tar.gz
 cd nagios-*
 ./configure --with-nagios-group=nagios --with-command-group=nagcmd
+#./configure --prefix=/usr/local/nagios-4.1.1 --sysconfdir=/etc/nagios --with-command-group=nagcmd
 
 make all
-sudo make install
-sudo make install-commandmode
-sudo make install-init
-sudo make install-config
-/usr/bin/install -c -m 644 sample-config/httpd.conf /etc/apache2/sites-available/nagios.conf
+make install
+make install-commandmode
+make install-init
+make install-config
+
+mkdir -p /var/log/nagios 
+chown nagios:nagios /var/log/nagios
+sh -c "echo '' >> /usr/local/nagios/etc/nagios.cfg"
+sh -c "echo 'log_file=/var/log/nagios/nagios.log' >> /usr/local/nagios/etc/nagios.cfg"
 
 cp -R contrib/eventhandlers/ /usr/local/nagios/libexec/
 chown -R nagios:nagios /usr/local/nagios/libexec/eventhandlers
+chown -R www-data:www-data /usr/local/nagios/share/
 
 ##########################################
 # install nagios plugins
@@ -58,9 +65,9 @@ tar xvf nrpe-*.tar.gz
 cd nrpe-*
 ./configure --enable-command-args --with-nagios-user=nagios --with-nagios-group=nagios --with-ssl=/usr/bin/openssl --with-ssl-lib=/usr/lib/x86_64-linux-gnu
 make all
-sudo make install
-sudo make install-xinetd
-sudo make install-daemon-config
+make install
+make install-xinetd
+make install-daemon-config
 
 sed -i "s|#server_address=127.0.0.1|server_address=192.168.82.170|g" /usr/local/nagios/etc/nrpe.cfg
 sed -i "s|allowed_hosts=127.0.0.1|allowed_hosts=127.0.0.1,localhost,192.168.82.170,192.168.82.171|g" /usr/local/nagios/etc/nrpe.cfg
@@ -82,14 +89,27 @@ mkdir -p /usr/local/nagios/etc/servers
 sed -i "s|nagios@localhost|doogee323@gmail.com|g" /usr/local/nagios/etc/objects/contacts.cfg
 
 ##########################################
+# install nginx
+##########################################
+apt-get install nginx -y
+
+cp /vagrant/etc/nginx/nginx.conf /etc/nginx/nginx.conf
+cp /vagrant/etc/nginx/nagios /etc/nginx/sites-available/nagios
+ln -s /etc/nginx/sites-available/nagios /etc/nginx/sites-enabled/nagios
+
+ln -s /usr/local/nagios/share /usr/local/nagios/share/nagios
+/usr/local/nagios/share# chown www-data:www-data /usr/local/nagios/share
+
+##########################################
 # setting htpasswd
 ##########################################
-sudo a2enmod rewrite
-sudo a2enmod cgi
-
 PASSWORD=nagiospasswd
 htpasswd -cb /usr/local/nagios/etc/htpasswd.users nagiosadmin $PASSWORD
 echo Password set to: $PASSWORD
+
+#/usr/local/bin/htpasswd.pl
+#chmod +x /usr/local/bin/htpasswd.pl
+#/usr/local/bin/htpasswd.pl nagiosadmin nagiospasswd | tee -a /usr/local/nagios/etc/htpasswd.users
 
 ##########################################
 # init.d nagios
@@ -107,26 +127,31 @@ sudo sh -c "echo 'PIDFILE=/usr/local/nagios/var/$NAME.lock' >> /etc/init.d/nagio
 chmod +x /etc/init.d/nagios
 update-rc.d nagios defaults
 
-sudo ln -s /etc/apache2/sites-available/nagios.conf /etc/apache2/sites-enabled/
-sudo chown -Rf nagios:nagios /usr/local/nagios
+chown -Rf nagios:nagios /usr/local/nagios
 
 ##########################################
 # restart services
 ##########################################
-service apache2 restart
-sudo service xinetd restart
+service xinetd restart
 #/etc/init.d/nagios restart
 service nagios restart
 #tail -f /var/log/syslog
 
-#http://192.168.82.170/nagios
+service fcgiwrap status
+service php7.0-fpm status
+
+service nginx stop
+nginx -s stop
+nginx
+
+#http://server.tz.com
 # nagiosadmin / nagiospasswd
 
 ##########################################
 # add a host
 ##########################################
 mkdir -p /usr/local/nagios/etc/servers
-sudo cp /vagrant/etc/nagios/ubuntu_host.cfg /usr/local/nagios/etc/servers/ubuntu_host.cfg
+cp /vagrant/etc/nagios/ubuntu_host.cfg /usr/local/nagios/etc/servers/ubuntu_host.cfg
 # vi /usr/local/nagios/etc/objects/commands.cfg
 /usr/local/nagios/bin/nagios -v /usr/local/nagios/etc/nagios.cfg
 
@@ -135,11 +160,11 @@ exit 0
 ##########################################
 # firewall rules
 ##########################################
-sudo mkdir -p /etc/iptables
-sudo cp /vagrant/etc/iptables/rules /etc/iptables/rules
+mkdir -p /etc/iptables
+cp /vagrant/etc/iptables/rules /etc/iptables/rules
 
 sudo sed -i "s/^iptables-restore//g" /etc/network/if-up.d/iptables
 sudo sh -c "echo 'iptables-restore < /etc/iptables/rules' >> /etc/network/if-up.d/iptables"
-sudo iptables-restore < /etc/iptables/rules
+iptables-restore < /etc/iptables/rules
 
 iptables -I INPUT -m tcp -p tcp --dport 5666 -j ACCEPT
