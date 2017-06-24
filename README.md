@@ -23,6 +23,8 @@ a Nagios server example on vagrant.
 	192.168.82.170 server.tz.com
 	
  	http://server.tz.com/nagios
+ 	
+ 	nagiosadmin / nagiospasswd
 ```
 
 
