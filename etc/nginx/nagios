@@ -20,7 +20,7 @@ server {
 	    fastcgi_param AUTH_USER $remote_user;
 	    fastcgi_param REMOTE_USER $remote_user;
 	    fastcgi_param SCRIPT_FILENAME /usr/local/nagios/sbin/$fastcgi_script_name;
-	    fastcgi_pass fcgiwrap;
+	    fastcgi_pass unix:/var/run/fcgiwrap.socket;
 	  }
 	
 	  location ~ \.php$ {

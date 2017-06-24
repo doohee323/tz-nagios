@@ -28,7 +28,6 @@ curl -L -O https://assets.nagios.com/downloads/nagioscore/releases/nagios-4.1.1.
 tar xvf nagios-*.tar.gz
 cd nagios-*
 ./configure --with-nagios-group=nagios --with-command-group=nagcmd
-#./configure --prefix=/usr/local/nagios-4.1.1 --sysconfdir=/etc/nagios --with-command-group=nagcmd
 
 make all
 make install
@@ -93,12 +92,11 @@ sed -i "s|nagios@localhost|doogee323@gmail.com|g" /usr/local/nagios/etc/objects/
 ##########################################
 apt-get install nginx -y
 
-cp /vagrant/etc/nginx/nginx.conf /etc/nginx/nginx.conf
 cp /vagrant/etc/nginx/nagios /etc/nginx/sites-available/nagios
 ln -s /etc/nginx/sites-available/nagios /etc/nginx/sites-enabled/nagios
 
 ln -s /usr/local/nagios/share /usr/local/nagios/share/nagios
-/usr/local/nagios/share# chown www-data:www-data /usr/local/nagios/share
+chown www-data:www-data /usr/local/nagios/share
 
 ##########################################
 # setting htpasswd
@@ -106,10 +104,6 @@ ln -s /usr/local/nagios/share /usr/local/nagios/share/nagios
 PASSWORD=nagiospasswd
 htpasswd -cb /usr/local/nagios/etc/htpasswd.users nagiosadmin $PASSWORD
 echo Password set to: $PASSWORD
-
-#/usr/local/bin/htpasswd.pl
-#chmod +x /usr/local/bin/htpasswd.pl
-#/usr/local/bin/htpasswd.pl nagiosadmin nagiospasswd | tee -a /usr/local/nagios/etc/htpasswd.users
 
 ##########################################
 # init.d nagios
