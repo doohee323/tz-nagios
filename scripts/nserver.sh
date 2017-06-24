@@ -124,6 +124,14 @@ update-rc.d nagios defaults
 chown -Rf nagios:nagios /usr/local/nagios
 
 ##########################################
+# add a host
+##########################################
+mkdir -p /usr/local/nagios/etc/servers
+cp /vagrant/etc/nagios/ubuntu_host.cfg /usr/local/nagios/etc/servers/ubuntu_host.cfg
+# vi /usr/local/nagios/etc/objects/commands.cfg
+/usr/local/nagios/bin/nagios -v /usr/local/nagios/etc/nagios.cfg
+
+##########################################
 # restart services
 ##########################################
 service xinetd restart
@@ -140,14 +148,6 @@ nginx
 
 #http://server.tz.com
 # nagiosadmin / nagiospasswd
-
-##########################################
-# add a host
-##########################################
-mkdir -p /usr/local/nagios/etc/servers
-cp /vagrant/etc/nagios/ubuntu_host.cfg /usr/local/nagios/etc/servers/ubuntu_host.cfg
-# vi /usr/local/nagios/etc/objects/commands.cfg
-/usr/local/nagios/bin/nagios -v /usr/local/nagios/etc/nagios.cfg
 
 exit 0
 
