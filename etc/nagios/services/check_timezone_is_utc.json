@@ -1,0 +1,8 @@
+{
+  "id": "check_timezone_is_utc",
+  "check_command": "check_nrpe!check_timezone_is_utc",
+  "max_check_attempts": 5,
+  "notification_options": "c,r,f",
+  "hostgroup_name": "all",
+  "command_line": "$USER1$/check_nrpe -H $HOSTADDRESS$ -c check_timezone_is_utc"
+}

@@ -1,0 +1,8 @@
+{
+  "id": "check_local_disk_usage",
+  "max_check_attempts": 5,
+  "check_command": "check_nrpe!check_local_disk_usage",
+  "notification_options": "c,r,f",
+  "command_line": "$USER1$/check_nrpe -H $HOSTADDRESS$ -c check_local_disk_usage",
+  "hostgroup_name": "all"
+}

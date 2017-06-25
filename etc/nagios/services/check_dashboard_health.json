@@ -1,0 +1,8 @@
+{
+  "id": "check_dashboard_health",
+  "host_search": "recipes:fd_integration_api\\:\\:monitoring",
+  "check_command": "check_nrpe!check_dashboard_health",
+  "max_check_attempts": 5,
+  "notification_options": "c,r,f",
+  "command_line": "$USER1$/check_nrpe -H $HOSTADDRESS$ -c check_dashboard_health"
+}

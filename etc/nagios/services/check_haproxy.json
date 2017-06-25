@@ -1,0 +1,8 @@
+{
+  "id": "check_haproxy",
+  "host_search": "(roles:haproxy OR recipes:fd_graphite\\:\\:ha)",
+  "max_check_attempts": 5,
+  "check_command": "check_nrpe!check_haproxy",
+  "notification_options": "c,r,f",
+  "command_line": "$USER1$/check_nrpe -H $HOSTADDRESS$ -c check_haproxy"
+}

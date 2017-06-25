@@ -1,0 +1,8 @@
+{
+  "id": "check_ntp_status",
+  "max_check_attempts": 5,
+  "check_command": "check_nrpe!check_ntp_status",
+  "notification_options": "c,r,f",
+  "command_line": "$USER1$/check_nrpe -H $HOSTADDRESS$ -c check_ntp_status",
+  "hostgroup_name": "all"
+}

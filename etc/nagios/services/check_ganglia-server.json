@@ -1,0 +1,8 @@
+{
+  "id": "check_ganglia-server",
+  "host_search": "roles:ganglia-server",
+  "max_check_attempts": 5,
+  "check_command": "check_nrpe!check_ganglia-server",
+  "notification_options": "c,r,f",
+  "command_line": "$USER1$/check_nrpe -H $HOSTADDRESS$ -c check_ganglia-server"
+}
