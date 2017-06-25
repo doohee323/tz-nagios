@@ -70,9 +70,9 @@ make install-daemon-config
 
 sed -i "s|#server_address=127.0.0.1|server_address=192.168.82.170|g" /usr/local/nagios/etc/nrpe.cfg
 sed -i "s|allowed_hosts=127.0.0.1|allowed_hosts=127.0.0.1,localhost,192.168.82.170,192.168.82.171|g" /usr/local/nagios/etc/nrpe.cfg
-service nagios-nrpe-server restart
+#service nagios-nrpe-server restart
 
-sudo sed -i "s/127.0.0.1/127.0.0.1 192.168.82.170/g" /etc/xinetd.d/nrpe
+sudo sed -i "s/127.0.0.1/127.0.0.1 192.168.82.171/g" /etc/xinetd.d/nrpe
 
 ##########################################
 # setting nagios
@@ -80,7 +80,7 @@ sudo sed -i "s/127.0.0.1/127.0.0.1 192.168.82.170/g" /etc/xinetd.d/nrpe
 sudo sh -c "echo '' >> /usr/local/nagios/etc/objects/commands.cfg"
 sudo sh -c "echo '	define command{' >> /usr/local/nagios/etc/objects/commands.cfg"
 sudo sh -c "echo '      command_name check_nrpe' >> /usr/local/nagios/etc/objects/commands.cfg"
-sudo sh -c "echo '      command_line \$USER1\$/check_nrpe -H \$HOSTADDRESS\$ -c \$ARG1\$' >> /usr/local/nagios/etc/objects/commands.cfg"
+sudo sh -c "echo '      command_line /usr/local/nagios/libexec/check_nrpe -H \$HOSTADDRESS\$ -c \$ARG1\$' >> /usr/local/nagios/etc/objects/commands.cfg"
 sudo sh -c "echo '	}' >> /usr/local/nagios/etc/objects/commands.cfg"
 
 sed -i "s|#cfg_dir=/usr/local/nagios/etc/servers|cfg_dir=/usr/local/nagios/etc/servers|g" /usr/local/nagios/etc/nagios.cfg 

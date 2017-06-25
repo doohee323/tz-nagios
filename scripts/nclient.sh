@@ -6,18 +6,38 @@ source /vagrant/setup.rc
 
 export DEBIAN_FRONTEND=noninteractive
 
-##########################################
-# install nagios
-##########################################
 apt-get -y update
-apt-get install nagios-nrpe-server nagios-plugins -y
 apt-get install openssl libssl-dev xinetd unzip -y
 
-sed -i "s|#server_address=127.0.0.1|server_address=192.168.82.170|g" /etc/nagios/nrpe.cfg
-sed -i "s|allowed_hosts=127.0.0.1|allowed_hosts=127.0.0.1,192.168.82.171|g" /etc/nagios/nrpe.cfg
+useradd nagios
+groupadd nagcmd
+usermod -a -G nagcmd nagios
 
-sudo sh -c "echo '' >> /etc/nagios/nrpe.cfg"
-sudo sh -c "echo 'command[check_hda1]=/usr/lib/nagios/plugins/check_disk -w 20% -c 10% -p /dev/sda1' >> /etc/nagios/nrpe.cfg"
+##########################################
+# install nagios plugins
+##########################################
+cd /home/vagrant
+curl -L -O http://nagios-plugins.org/download/nagios-plugins-2.1.1.tar.gz 
+tar xvf nagios-plugins-*.tar.gz
+cd nagios-plugins-*
+./configure --with-nagios-user=nagios --with-nagios-group=nagios --with-openssl
+make
+make install
+
+##########################################
+# install nrpe
+##########################################
+cd /home/vagrant
+curl -L -O http://downloads.sourceforge.net/project/nagios/nrpe-2.x/nrpe-2.15/nrpe-2.15.tar.gz 
+tar xvf nrpe-*.tar.gz
+cd nrpe-*
+./configure --enable-command-args --with-nagios-user=nagios --with-nagios-group=nagios --with-ssl=/usr/bin/openssl --with-ssl-lib=/usr/lib/x86_64-linux-gnu
+make all
+make install
+make install-xinetd
+make install-daemon-config
+
+sudo sed -i "s/127.0.0.1/127.0.0.1 192.168.82.170/g" /etc/xinetd.d/nrpe
 
 # for make ssh connection
 mkdir -p /root/.ssh
@@ -26,8 +46,9 @@ sudo cp /vagrant/etc/known_hosts /root/.ssh/known_hosts
 ##########################################
 # restart services
 ##########################################
-service nagios-nrpe-server restart
-service nagios-nrpe-server status
+service xinetd restart
+#service xinetd stop
+
 #tail -f /var/log/syslog
 
 exit 0
