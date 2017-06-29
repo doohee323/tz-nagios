@@ -7,7 +7,7 @@ source /vagrant/setup.rc
 export DEBIAN_FRONTEND=noninteractive
 
 apt-get -y update
-apt-get install openssl libssl-dev xinetd unzip -y
+apt-get install openssl libssl-dev xinetd unzip make gcc -y
 
 useradd nagios
 groupadd nagcmd
@@ -37,7 +37,8 @@ make install
 make install-xinetd
 make install-daemon-config
 
-sudo sed -i "s/127.0.0.1/127.0.0.1 192.168.82.170/g" /etc/xinetd.d/nrpe
+sudo cp /vagrant/etc/nagios/nrpe.cfg /usr/local/nagios/etc/nrpe.cfg
+sudo sed -i "s/127.0.0.1/127.0.0.1 localhost 192.168.82.170/g" /etc/xinetd.d/nrpe
 
 # for make ssh connection
 mkdir -p /root/.ssh
