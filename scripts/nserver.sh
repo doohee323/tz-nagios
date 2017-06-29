@@ -83,6 +83,12 @@ sudo sh -c "echo '      command_name check_nrpe' >> /usr/local/nagios/etc/object
 sudo sh -c "echo '      command_line /usr/local/nagios/libexec/check_nrpe -H \$HOSTADDRESS\$ -c \$ARG1\$' >> /usr/local/nagios/etc/objects/commands.cfg"
 sudo sh -c "echo '	}' >> /usr/local/nagios/etc/objects/commands.cfg"
 
+sudo sh -c "echo '' >> /usr/local/nagios/etc/objects/commands.cfg"
+sudo sh -c "echo '	define command{' >> /usr/local/nagios/etc/objects/commands.cfg"
+sudo sh -c "echo '      command_name PING_SUCCESS' >> /usr/local/nagios/etc/objects/commands.cfg"
+sudo sh -c "echo '      command_line /usr/local/nagios/libexec/check_dummy 100' >> /usr/local/nagios/etc/objects/commands.cfg"
+sudo sh -c "echo '	}' >> /usr/local/nagios/etc/objects/commands.cfg"
+
 sed -i "s|#cfg_dir=/usr/local/nagios/etc/servers|cfg_dir=/usr/local/nagios/etc/servers|g" /usr/local/nagios/etc/nagios.cfg 
 mkdir -p /usr/local/nagios/etc/servers
 sed -i "s|nagios@localhost|doogee323@gmail.com|g" /usr/local/nagios/etc/objects/contacts.cfg
@@ -128,6 +134,11 @@ chown -Rf nagios:nagios /usr/local/nagios
 ##########################################
 mkdir -p /usr/local/nagios/etc/servers
 cp /vagrant/etc/nagios/ubuntu_host.cfg /usr/local/nagios/etc/servers/ubuntu_host.cfg
+
+cp /vagrant/etc/nagios/objects/hostgroups.cfg /usr/local/nagios/etc/objects/hostgroups.cfg
+sed -i "s|objects/localhost.cfg|objects/localhost.cfg\ncfg_file=/usr/local/nagios/etc/objects/hostgroups.cfg|g" /usr/local/nagios/etc/nagios.cfg
+chown nagios:nagios /usr/local/nagios/etc/servers/*
+
 # vi /usr/local/nagios/etc/objects/commands.cfg
 /usr/local/nagios/bin/nagios -v /usr/local/nagios/etc/nagios.cfg
 
@@ -149,6 +160,9 @@ nginx
 #http://server.tz.com
 # nagiosadmin / nagiospasswd
 
+# mail settings
+# bash /vagrant/scripts/smtp.sh
+
 exit 0
 
 ##########################################
@@ -162,3 +176,5 @@ sudo sh -c "echo 'iptables-restore < /etc/iptables/rules' >> /etc/network/if-up.
 iptables-restore < /etc/iptables/rules
 
 iptables -I INPUT -m tcp -p tcp --dport 5666 -j ACCEPT
+
+
